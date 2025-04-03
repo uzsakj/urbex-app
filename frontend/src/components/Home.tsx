@@ -32,7 +32,7 @@ const Home: React.FC = () => {
             }}
         >
             <Box sx={{
-                backgroundColor: 'rgba(255, 254, 254, 0.7)',
+                backgroundColor: 'rgba(255, 254, 254, 1)',
                 padding: '20px',
                 borderRadius: '8px',
                 textShadow: '2px 2px 4px rgba(0, 0, 0, 0.4)'

@@ -1,5 +1,5 @@
 import React, { useState, FormEvent } from 'react';
-import { Button, TextField, Typography, Container, Grid, Paper, Box, Snackbar } from '@mui/material';
+import { Button, TextField, Typography, Box, Snackbar } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 
 const Register: React.FC = () => {
@@ -7,8 +7,8 @@ const Register: React.FC = () => {
     const [email, setEmail] = useState<string>('');
     const [password, setPassword] = useState<string>('');
     const [error, setError] = useState<string | null>(null);
-    const [openSnackbar, setOpenSnackbar] = useState<boolean>(false); // To manage Snackbar visibility
-    const [snackbarMessage, setSnackbarMessage] = useState<string>(''); // To manage Snackbar message
+    const [openSnackbar, setOpenSnackbar] = useState<boolean>(false);
+    const [snackbarMessage, setSnackbarMessage] = useState<string>('');
 
     const apiDomain: string = import.meta.env.VITE_API_DOMAIN || '';
     const navigate = useNavigate();
@@ -42,63 +42,85 @@ const Register: React.FC = () => {
                 setError(data.message || data.error || 'Something went wrong');
             }
         } catch (err) {
-            setError(`Error occured: ${err}`);
+            setError(`Error occurred: ${err}`);
         }
     };
 
     return (
-        <Box display="flex" justifyContent="center" alignItems="center" height="100vh">
-            <Container component="main" maxWidth="xs">
-                <Paper elevation={3} sx={{ padding: 3 }}>
-                    <Typography variant="h5" component="h1" gutterBottom>
+        <Box
+            sx={{
+                width: '100vw',
+                height: '100vh',
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                flexDirection: 'column',
+                textAlign: 'center',
+                position: 'relative',
+                backgroundImage: 'url(/urbex.jpg)',
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+                backgroundRepeat: 'no-repeat',
+            }}
+        >
+            <Box
+                sx={{
+                    backgroundColor: 'rgba(255, 254, 254, 1)',
+                    padding: '20px',
+                    borderRadius: '8px',
+                    textShadow: '2px 2px 4px rgba(0, 0, 0, 0.4)',
+                    width: '100%',
+                    maxWidth: '400px',
+                }}
+            >
+                <Typography variant="h4" gutterBottom>
+                    Register
+                </Typography>
+
+                <form onSubmit={handleSubmit}>
+                    <TextField
+                        margin="normal"
+                        required
+                        fullWidth
+                        label="Username"
+                        variant="filled"
+                        value={username}
+                        onChange={(e) => setUsername(e.target.value)}
+                    />
+                    <TextField
+                        margin="normal"
+                        required
+                        fullWidth
+                        label="Email Address"
+                        variant="filled"
+                        type="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                    />
+                    <TextField
+                        margin="normal"
+                        required
+                        fullWidth
+                        label="Password"
+                        variant="filled"
+                        type="password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                    />
+                    {error && <Typography color="error">{error}</Typography>}
+                    <Button type="submit" fullWidth variant="contained" color="primary" sx={{ mt: 3 }}>
                         Register
-                    </Typography>
+                    </Button>
+                </form>
 
-                    <form onSubmit={handleSubmit}>
-                        <TextField
-                            margin="normal"
-                            required
-                            fullWidth
-                            label="Username"
-                            variant="filled"
-                            value={username}
-                            onChange={(e) => setUsername(e.target.value)}
-                        />
-                        <TextField
-                            margin="normal"
-                            required
-                            fullWidth
-                            label="Email Address"
-                            variant="filled"
-                            type="email"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                        />
-                        <TextField
-                            margin="normal"
-                            required
-                            fullWidth
-                            label="Password"
-                            variant="filled"
-                            type="password"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                        />
-                        {error && <Typography color="error">{error}</Typography>}
-                        <Button type="submit" fullWidth variant="contained" color="primary" sx={{ mt: 3 }}>
-                            Register
-                        </Button>
-                    </form>
-
-                    <Grid container justifyContent="flex-end" sx={{ mt: 2 }}>
-                        <Grid>
-                            <Button onClick={() => navigate('/login')} color="primary">
-                                Already have an account? Login
-                            </Button>
-                        </Grid>
-                    </Grid>
-                </Paper>
-            </Container>
+                <Button
+                    onClick={() => navigate('/login')}
+                    color="primary"
+                    sx={{ mt: 2 }}
+                >
+                    Already have an account? Login
+                </Button>
+            </Box>
 
             <Snackbar
                 open={openSnackbar}
