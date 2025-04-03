@@ -1,6 +1,6 @@
 import React from 'react';
-import { Button, Container, Typography, Box } from '@mui/material';
-import { useNavigate } from 'react-router-dom'; // Import useNavigate from react-router-dom v6
+import { Button, Typography, Box } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 
 const Home: React.FC = () => {
     const navigate = useNavigate(); // Use navigate for routing
@@ -16,43 +16,55 @@ const Home: React.FC = () => {
     };
 
     return (
-        <Container component="main" maxWidth="xs">
-            <Box
-                sx={{
-                    display: 'flex',
-                    flexDirection: 'column',   // Stack elements vertically
-                    alignItems: 'center',      // Center items horizontally
-                    justifyContent: 'center',  // Optional: Vertically center the content (if you want full page center)
-                    height: '100vh',           // Make sure the Box takes full viewport height
-                    textAlign: 'center',       // Ensure text is centered
-                }}
-            >
-                <Typography variant="h4" gutterBottom>
-                    Welcome to Our App
+        <Box
+            sx={{
+                width: '100vw',
+                height: '100vh',
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                flexDirection: 'column',
+                textAlign: 'center',
+                position: 'relative',
+                backgroundImage: 'url(/urbex.jpg)',
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+                backgroundRepeat: 'no-repeat',
+                overflow: 'hidden',
+            }}
+        >
+            <Box sx={{
+                backgroundColor: 'rgba(255, 254, 254, 0.7)',
+                padding: '20px',
+                borderRadius: '8px',
+                textShadow: '2px 2px 4px rgba(0, 0, 0, 0.4)'
+            }}>
+                <Typography variant="h4" gutterBottom >
+                    Welcome to UrbexHub
                 </Typography>
                 <Typography variant="body1" gutterBottom>
-                    Please choose an option to continue.
+                    Please Log in or Sign up to continue.
                 </Typography>
 
                 <Button
                     variant="contained"
                     color="primary"
-                    sx={{ mt: 2, width: '100%' }}  // Ensuring buttons are full width within the container
-                    onClick={goToLogin} // Navigate to login
+                    sx={{ mt: 2, width: '100%' }}
+                    onClick={goToLogin}
                 >
-                    Go to Login
+                    Log in
                 </Button>
 
                 <Button
                     variant="contained"
                     color="secondary"
-                    sx={{ mt: 2, width: '100%' }} // Ensure buttons are full width
-                    onClick={goToRegister} // Navigate to register
+                    sx={{ mt: 2, width: '100%' }}
+                    onClick={goToRegister}
                 >
-                    Go to Sign Up
+                    Sign Up
                 </Button>
             </Box>
-        </Container>
+        </Box>
     );
 };
 
