@@ -3,14 +3,12 @@ import { Button, Typography, Box } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 
 const Home: React.FC = () => {
-    const navigate = useNavigate(); // Use navigate for routing
+    const navigate = useNavigate();
 
-    // Handler to navigate to login
     const goToLogin = () => {
         navigate('/login');
     };
 
-    // Handler to navigate to register
     const goToRegister = () => {
         navigate('/register');
     };
