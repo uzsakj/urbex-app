@@ -46,8 +46,7 @@ const Home: React.FC = () => {
 
                 <Button
                     variant="contained"
-                    color="primary"
-                    sx={{ mt: 2, width: '100%' }}
+                    sx={{ mt: 2, width: '100%', backgroundColor: '#757575' }}
                     onClick={goToLogin}
                 >
                     Log in
@@ -55,8 +54,7 @@ const Home: React.FC = () => {
 
                 <Button
                     variant="contained"
-                    color="secondary"
-                    sx={{ mt: 2, width: '100%' }}
+                    sx={{ mt: 2, width: '100%', backgroundColor: '#03a9f4' }}
                     onClick={goToRegister}
                 >
                     Sign Up

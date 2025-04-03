@@ -28,6 +28,7 @@ const Login: React.FC = () => {
 
             if (response.ok) {
                 setError(null);
+                localStorage.setItem('authToken', data.token);
                 navigate('/dashboard');
             } else {
                 setError(data.message || data.error || 'Something went wrong');
@@ -90,7 +91,7 @@ const Login: React.FC = () => {
                         onChange={(e) => setPassword(e.target.value)}
                     />
                     {error && <Typography color="error">{error}</Typography>}
-                    <Button type="submit" fullWidth variant="contained" color="primary" sx={{ mt: 3 }}>
+                    <Button type="submit" fullWidth variant="contained" color="primary" sx={{ mt: 3, backgroundColor: '#757575' }}>
                         Login
                     </Button>
                 </form>

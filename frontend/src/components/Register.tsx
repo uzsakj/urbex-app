@@ -108,7 +108,7 @@ const Register: React.FC = () => {
                         onChange={(e) => setPassword(e.target.value)}
                     />
                     {error && <Typography color="error">{error}</Typography>}
-                    <Button type="submit" fullWidth variant="contained" color="primary" sx={{ mt: 3 }}>
+                    <Button type="submit" fullWidth variant="contained" color="primary" sx={{ mt: 3, backgroundColor: '#03a9f4' }}>
                         Register
                     </Button>
                 </form>
