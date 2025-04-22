@@ -29,7 +29,11 @@ const Login: React.FC = () => {
             if (response.ok) {
                 setError(null);
                 localStorage.setItem('authToken', data.token);
-                navigate('/dashboard');
+                if (data.profileIncomplete) {
+                    navigate('/profile');
+                } else {
+                    navigate('/dashboard');
+                }
             } else {
                 setError(data.message || data.error || 'Something went wrong');
             }

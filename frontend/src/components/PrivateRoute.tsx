@@ -7,7 +7,7 @@ interface PrivateRouteProps {
 }
 
 const PrivateRoute: React.FC<PrivateRouteProps> = ({ element }) => {
-    const isAuthenticated = Boolean(localStorage.getItem('authToken')); // Check if the user is logged in
+    const isAuthenticated = Boolean(localStorage.getItem('authToken'));
 
     return isAuthenticated ? (
         <>{element}</> // Render the element if authenticated
