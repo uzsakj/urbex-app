@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
-import { httpResponse } from '../lib/httpResponse';
+import { httpResponse } from '../lib/httpResponse.ts';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
 
@@ -23,8 +23,13 @@ export const authenticateJWT = (
 
     try {
         const decoded = jwt.verify(token, JWT_SECRET);
-        req.user = decoded;
-        next();
+
+        if (typeof decoded !== 'string' && decoded && 'userId' in decoded) {
+            req.user = { id: decoded.userId };
+            next();
+        } else {
+            return httpResponse(403, 'Forbidden: Invalid token', null, res);
+        }
     } catch (err) {
         return httpResponse(403, 'Forbidden: Invalid or expired token', null, res);
     }

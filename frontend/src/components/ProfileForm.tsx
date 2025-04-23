@@ -54,7 +54,7 @@ const ProfileForm: React.FC = () => {
         try {
             // Use fetch instead of axios
             const response = await fetch(`${apiDomain}/profile`, {
-                method: 'PATCH',
+                method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     Authorization: `Bearer ${authToken}`,

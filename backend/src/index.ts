@@ -6,6 +6,8 @@ import cors from 'cors';
 const registerRouter = await import('./routes/register.ts');
 const loginRouter = await import('./routes/login.ts');
 const logoutRouter = await import('./routes/logout.ts');
+const profileRouter = await import('./routes/profile.ts');
+const { authenticateJWT } = await import('./middleware/auth.ts');
 
 async function start() {
 
@@ -39,6 +41,7 @@ async function start() {
     app.use('/register', registerRouter.default);
     app.use('/login', loginRouter.default);
     app.use('/logout', logoutRouter.default);
+    app.use('/profile', authenticateJWT, profileRouter.default);
 
     app.listen(process.env.PORT, () => {
         console.log('Server is running on port ' + process.env.PORT);
