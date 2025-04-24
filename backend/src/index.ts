@@ -38,10 +38,10 @@ async function start() {
 
     // Routes
 
-    app.use('/register', registerRouter.default);
-    app.use('/login', loginRouter.default);
-    app.use('/logout', logoutRouter.default);
-    app.use('/profile', authenticateJWT, profileRouter.default);
+    app.use('/api/register', registerRouter.default);
+    app.use('/api/login', loginRouter.default);
+    app.use('/api/logout', logoutRouter.default);
+    app.use('/api/profile', authenticateJWT, profileRouter.default);
 
     app.listen(process.env.PORT, () => {
         console.log('Server is running on port ' + process.env.PORT);

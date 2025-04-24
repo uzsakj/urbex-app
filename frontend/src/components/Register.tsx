@@ -1,6 +1,7 @@
 import React, { useState, FormEvent } from 'react';
 import { Button, TextField, Typography, Box, Snackbar } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
+import { register } from '../api/auth.ts';
 
 const Register: React.FC = () => {
     const [username, setUsername] = useState<string>('');
@@ -10,37 +11,22 @@ const Register: React.FC = () => {
     const [openSnackbar, setOpenSnackbar] = useState<boolean>(false);
     const [snackbarMessage, setSnackbarMessage] = useState<string>('');
 
-    const apiDomain: string = import.meta.env.VITE_API_DOMAIN || '';
     const navigate = useNavigate();
 
     const handleSubmit = async (e: FormEvent) => {
         e.preventDefault();
 
-        const payload = { username, email, password };
-
         try {
-            const response = await fetch(`${apiDomain}/register`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(payload),
-            });
+            const payload = { username, email, password }
+            await register(payload)
+            setError(null);
+            setSnackbarMessage('Registration successful! Redirecting to login...');
+            setOpenSnackbar(true);
 
-            const data = await response.json();
-
-            if (response.ok) {
-                setError(null);
-                setSnackbarMessage('Registration successful! Redirecting to login...');
-                setOpenSnackbar(true);
-
-                // Navigate to login after 5 seconds
-                setTimeout(() => {
-                    navigate('/login');
-                }, 5000);
-            } else {
-                setError(data.message || data.error || 'Something went wrong');
-            }
+            // Navigate to login after 5 seconds
+            setTimeout(() => {
+                navigate('/login');
+            }, 5000);
         } catch (err) {
             setError(`Error occurred: ${err}`);
         }

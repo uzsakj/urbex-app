@@ -9,19 +9,12 @@ import {
     Alert,
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-
-
-type ProfileData = {
-    fullName: string;
-    biography: string;
-    province: string;
-};
-
-const apiDomain: string = import.meta.env.VITE_API_DOMAIN || '';
+import { updateProfile } from '../api/profile';
+import { IProfile } from '../interfaces/profile.interface'
 
 const ProfileForm: React.FC = () => {
     const navigate = useNavigate();
-    const [formData, setFormData] = useState<ProfileData>({
+    const [formData, setFormData] = useState<IProfile>({
         fullName: '',
         biography: '',
         province: '',
@@ -52,20 +45,7 @@ const ProfileForm: React.FC = () => {
         }
 
         try {
-            // Use fetch instead of axios
-            const response = await fetch(`${apiDomain}/profile`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${authToken}`,
-                },
-                body: JSON.stringify(formData),
-            });
-
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.message || 'Something went wrong');
-            }
+            await updateProfile(formData)
 
             setSnackbarMessage('Profile updated successfully!');
             setSnackbarSeverity('success');

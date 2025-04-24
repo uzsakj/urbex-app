@@ -1,41 +1,26 @@
 import React, { useState, FormEvent } from 'react';
 import { Button, TextField, Typography, Box } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-
+import { login } from '../api/auth.ts';
 const Login: React.FC = () => {
     const [email, setEmail] = useState<string>('');
     const [password, setPassword] = useState<string>('');
     const [error, setError] = useState<string | null>(null);
 
-    const apiDomain: string = import.meta.env.VITE_API_DOMAIN || '';
     const navigate = useNavigate();
 
     const handleSubmit = async (e: FormEvent) => {
         e.preventDefault();
 
-        const payload = { email, password };
-
         try {
-            const response = await fetch(`${apiDomain}/login`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(payload),
-            });
-
-            const data = await response.json();
-
-            if (response.ok) {
-                setError(null);
-                localStorage.setItem('authToken', data.token);
-                if (data.profileIncomplete) {
-                    navigate('/profile');
-                } else {
-                    navigate('/dashboard');
-                }
+            const payload = { email, password }
+            const data = await login(payload)
+            setError(null);
+            localStorage.setItem('authToken', data.token);
+            if (data.profileIncomplete) {
+                navigate('/profile');
             } else {
-                setError(data.message || data.error || 'Something went wrong');
+                navigate('/dashboard');
             }
         } catch (err) {
             setError(`Error occurred: ${err}`);
