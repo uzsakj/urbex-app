@@ -7,6 +7,7 @@ const registerRouter = await import('./routes/register.ts');
 const loginRouter = await import('./routes/login.ts');
 const logoutRouter = await import('./routes/logout.ts');
 const profileRouter = await import('./routes/profile.ts');
+const locationRouter = await import('./routes/location.ts');
 const { authenticateJWT } = await import('./middleware/auth.ts');
 
 async function start() {
@@ -42,6 +43,8 @@ async function start() {
     app.use('/api/login', loginRouter.default);
     app.use('/api/logout', logoutRouter.default);
     app.use('/api/profile', authenticateJWT, profileRouter.default);
+    app.use('/api/locations', authenticateJWT, locationRouter.default);
+
 
     app.listen(process.env.PORT, () => {
         console.log('Server is running on port ' + process.env.PORT);
