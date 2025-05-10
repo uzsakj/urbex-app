@@ -1,12 +1,14 @@
 import { httpClient } from './httpClient';
-import { ProfileDto } from './dto/profile.dto';
-
 const getToken = () => localStorage.getItem('authToken');
-
 export const getProfile = async () => {
-    return await httpClient('/api/profile', 'GET', undefined, getToken()!);
+    const { data } = await httpClient('/api/profile', 'GET', undefined, getToken()!);
+    return data;
 };
 
-export const updateProfile = async (profile: ProfileDto) => {
-    return await httpClient('/api/profile', 'POST', profile, getToken()!);
+export const createProfile = async (formData: FormData) => {
+    return httpClient('/api/profile', 'POST', formData, getToken()!);
+};
+
+export const updateProfile = async (formData: FormData) => {
+    return httpClient('/api/profile', 'PATCH', formData, getToken()!);
 };

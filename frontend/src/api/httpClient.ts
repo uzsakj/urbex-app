@@ -7,18 +7,28 @@ export const httpClient = async (
     body?: any,
     token?: string
 ) => {
-    const headers: Record<string, string> = {
-        'Content-Type': 'application/json',
-    };
-    if (token) headers['Authorization'] = `Bearer ${token}`;
+    const headers: Record<string, string> = {};
+    const isFormData = body instanceof FormData;
+    if (!isFormData) {
+        headers['Content-Type'] = 'application/json';
+    }
+
+    if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+    }
 
     const response = await fetch(`${apiDomain}${endpoint}`, {
         method,
         headers,
-        body: body ? JSON.stringify(body) : undefined,
+        body: isFormData ? body : body ? JSON.stringify(body) : undefined,
     });
 
-    const data = await response.json();
+    let data;
+    try {
+        data = await response.json();
+    } catch {
+        data = null;
+    }
 
     if (!response.ok) throw new Error(data?.message || 'Request failed');
 

@@ -1,5 +1,6 @@
 export interface ProfileDto {
-    fullName: string;
-    biography: string;
-    province: string;
+    fullName?: string;
+    biography?: string;
+    province?: string;
+    avatarUrl?: string;
 };
