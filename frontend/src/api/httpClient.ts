@@ -9,6 +9,7 @@ export const httpClient = async (
 ) => {
     const headers: Record<string, string> = {};
     const isFormData = body instanceof FormData;
+
     if (!isFormData) {
         headers['Content-Type'] = 'application/json';
     }
@@ -30,7 +31,15 @@ export const httpClient = async (
         data = null;
     }
 
-    if (!response.ok) throw new Error(data?.message || 'Request failed');
+
+    if (response.status === 401) {
+        localStorage.removeItem('authToken');
+        window.location.href = '/login';
+    }
+
+    if (!response.ok) {
+        throw new Error(data?.message || 'Request failed');
+    }
 
     return data;
 };
