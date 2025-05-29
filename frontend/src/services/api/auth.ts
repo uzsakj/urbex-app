@@ -14,3 +14,9 @@ export const logout = async () => {
     await httpClient('/api/logout', 'POST');
     localStorage.removeItem('authToken');
 };
+
+export const isAuthenticated = (): boolean => {
+    const token = localStorage.getItem('authToken');
+    return !!token;
+};
+

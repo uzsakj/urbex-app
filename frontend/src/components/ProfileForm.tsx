@@ -12,7 +12,7 @@ import {
     IconButton,
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-import { updateProfile, getProfile, createProfile } from '../api/profile';
+import { updateProfile, getProfile, createProfile } from '../services/api/profile';
 import { IProfile } from '../interfaces/profile.interface';
 import AddIcon from '@mui/icons-material/Add';
 
@@ -124,7 +124,7 @@ const ProfileForm: React.FC = () => {
             setSnackbarMessage(profileExists ? 'Profile updated successfully!' : 'Profile created successfully!');
             setSnackbarSeverity('success');
             setSnackbarOpen(true);
-            navigate('/dashboard');
+            navigate('/');
         } catch (error) {
             console.error(error);
             setSnackbarMessage(`Something went wrong. ${error}`);
@@ -134,7 +134,7 @@ const ProfileForm: React.FC = () => {
     };
 
     const handleSkip = () => {
-        navigate('/dashboard');
+        navigate('/');
     };
 
     const handleSnackbarClose = () => {

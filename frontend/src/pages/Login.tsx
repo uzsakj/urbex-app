@@ -1,7 +1,7 @@
 import React, { useState, FormEvent } from 'react';
 import { Button, TextField, Typography, Box } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-import { login } from '../api/auth.ts';
+import { login } from '../services/api/auth.ts';
 const Login: React.FC = () => {
     const [email, setEmail] = useState<string>('');
     const [password, setPassword] = useState<string>('');
@@ -20,7 +20,7 @@ const Login: React.FC = () => {
             if (data.profileIncomplete) {
                 navigate('/profile');
             } else {
-                navigate('/dashboard');
+                navigate('/');
             }
         } catch (err) {
             setError(`Error occurred: ${err}`);

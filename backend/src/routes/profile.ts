@@ -10,7 +10,7 @@ interface AuthenticatedRequest extends Request {
     user?: { id: string };
 }
 
-const upload = multer({ dest: 'avatars/' });
+const upload = multer({ dest: 'uploads/avatars/' });
 const router = express.Router();
 
 
@@ -101,7 +101,6 @@ router.patch('/', upload.single('avatar'), async (req: AuthenticatedRequest, res
     }
 });
 
-// DELETE avatar
 router.delete('/avatar', async (req: AuthenticatedRequest, res) => {
     const userId = req?.user?.id;
 

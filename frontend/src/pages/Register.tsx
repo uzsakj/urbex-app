@@ -1,7 +1,7 @@
 import React, { useState, FormEvent } from 'react';
 import { Button, TextField, Typography, Box, Snackbar } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-import { register } from '../api/auth.ts';
+import { register } from '../services/api/auth.ts';
 
 const Register: React.FC = () => {
     const [username, setUsername] = useState<string>('');

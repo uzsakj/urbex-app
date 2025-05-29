@@ -43,7 +43,7 @@ async function start() {
     app.use('/api/login', loginRouter.default);
     app.use('/api/logout', logoutRouter.default);
     app.use('/api/profile', authenticateJWT, profileRouter.default);
-    app.use('/api/locations', authenticateJWT, locationRouter.default);
+    app.use('/api/location', authenticateJWT, locationRouter.default);
 
 
     app.listen(process.env.PORT, () => {
