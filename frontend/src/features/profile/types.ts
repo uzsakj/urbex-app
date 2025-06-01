@@ -1,4 +1,4 @@
-export interface ProfileDto {
+export interface Profile {
     fullName?: string;
     biography?: string;
     province?: string;

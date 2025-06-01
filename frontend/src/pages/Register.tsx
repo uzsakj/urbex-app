@@ -1,15 +1,22 @@
 import React, { useState, FormEvent } from 'react';
 import { Button, TextField, Typography, Box, Snackbar } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-import { register } from '../services/api/auth.ts';
+import { useDispatch, useSelector } from 'react-redux';
+import { AppDispatch, RootState } from '../store/index.ts';
+import { register } from '../features/auth/authSlice.ts';
+import { Status } from '../store/status.enum.ts';
 
 const Register: React.FC = () => {
+    const dispatch = useDispatch<AppDispatch>();
+
     const [username, setUsername] = useState<string>('');
     const [email, setEmail] = useState<string>('');
     const [password, setPassword] = useState<string>('');
-    const [error, setError] = useState<string | null>(null);
     const [openSnackbar, setOpenSnackbar] = useState<boolean>(false);
     const [snackbarMessage, setSnackbarMessage] = useState<string>('');
+
+    const status = useSelector((state: RootState) => state.auth.status)
+
 
     const navigate = useNavigate();
 
@@ -17,19 +24,18 @@ const Register: React.FC = () => {
         e.preventDefault();
 
         try {
-            const payload = { username, email, password }
-            await register(payload)
-            setError(null);
+            await dispatch(register({ username, email, password })).unwrap();
             setSnackbarMessage('Registration successful! Redirecting to login...');
-            setOpenSnackbar(true);
-
-            // Navigate to login after 5 seconds
+            setOpenSnackbar(true)
+            // navigate to login after 3 s
             setTimeout(() => {
                 navigate('/login');
-            }, 5000);
-        } catch (err) {
-            setError(`Error occurred: ${err}`);
+            }, 3000)
+        } catch (error) {
+            setSnackbarMessage(error);
+            setOpenSnackbar(true)
         }
+
     };
 
     return (
@@ -93,9 +99,8 @@ const Register: React.FC = () => {
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                     />
-                    {error && <Typography color="error">{error}</Typography>}
                     <Button type="submit" fullWidth variant="contained" color="primary" sx={{ mt: 3, backgroundColor: '#03a9f4' }}>
-                        Register
+                        {status === Status.LOADING ? 'Registering...' : 'Register'}
                     </Button>
                 </form>
 

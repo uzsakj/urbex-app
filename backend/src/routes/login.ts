@@ -23,6 +23,7 @@ router.post('/', async (req: Request & {
 
         // Check if user exists and pw is valid
         const user = await User.findOne({ email });
+
         const profile = await Profile.findOne({ user });
         if (!user || !user.validatePassword(password)) {
             return res.status(401).json({ error: 'Invalid credentials' });
@@ -30,7 +31,17 @@ router.post('/', async (req: Request & {
 
         // Create JWT token
         const token = jwt.sign({ userId: user._id }, SECRET_KEY, { expiresIn: '1h' });
-        res.json({ token, profileIncomplete: !!profile ? false : true });
+        res.json({
+            user: {
+                id: user.id,
+                username: user.username,
+                email: user.email,
+                profileIncomplete: !!profile ? false : true
+            },
+            token
+        }
+        );
+
 
     } catch (error) {
         return httpResponse(500, "Internal server error", { error: error }, res);

@@ -1,31 +1,18 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { Box, CircularProgress, Pagination, Typography } from '@mui/material';
-import { ILocation } from '../interfaces/location.interface';
 import LocationCard from './LocationCard';
-import { getLocation } from '../services/api/location';
+import { useSelector } from 'react-redux';
+import { RootState } from '../store';
+import { Status } from '../store/status.enum';
 interface LocationGridProps {
     title?: string;
-    locationsArray?: ILocation[];
 }
 
-const LocationGrid: React.FC<LocationGridProps> = ({ title, locationsArray }) => {
-    const [locations, setLocations] = useState<ILocation[]>(locationsArray || []);
-    const [loading, setLoading] = useState(true);
+const LocationGrid: React.FC<LocationGridProps> = ({ title }) => {
 
-    useEffect(() => {
-        const fetchLocations = async () => {
-            try {
-                const data = await getLocation();
-                setLocations(data);
-            } catch (err) {
-                console.error('Failed to fetch locations:', err);
-            } finally {
-                setLoading(false);
-            }
-        };
+    const locations = useSelector((state: RootState) => state.locations.items)
+    const status = useSelector((state: RootState) => state.locations.status)
 
-        fetchLocations();
-    }, []);
 
     const handleView = (id: string) => {
         // Implement routing or modal handling here
@@ -40,7 +27,7 @@ const LocationGrid: React.FC<LocationGridProps> = ({ title, locationsArray }) =>
                 </Typography>
             )}
 
-            {loading ? (
+            {status === Status.LOADING ? (
                 <CircularProgress />
             ) : (
                 <>

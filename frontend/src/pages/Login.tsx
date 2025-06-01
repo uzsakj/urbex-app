@@ -1,29 +1,32 @@
 import React, { useState, FormEvent } from 'react';
 import { Button, TextField, Typography, Box } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-import { login } from '../services/api/auth.ts';
+import { login } from '../features/auth/authSlice';
+import { AppDispatch, RootState } from '../store';
+import { useDispatch, useSelector } from 'react-redux';
+import { Status } from '../store/status.enum';
+
 const Login: React.FC = () => {
+    const dispatch = useDispatch<AppDispatch>();
+    const navigate = useNavigate();
+    const error = useSelector((state: RootState) => state.auth.error);
+    const status = useSelector((state: RootState) => state.auth.status)
+
     const [email, setEmail] = useState<string>('');
     const [password, setPassword] = useState<string>('');
-    const [error, setError] = useState<string | null>(null);
-
-    const navigate = useNavigate();
 
     const handleSubmit = async (e: FormEvent) => {
         e.preventDefault();
 
-        try {
-            const payload = { email, password }
-            const data = await login(payload)
-            setError(null);
-            localStorage.setItem('authToken', data.token);
-            if (data.profileIncomplete) {
+
+        const resultAction = await dispatch(login({ email, password }));
+
+        if (login.fulfilled.match(resultAction)) {
+            if (resultAction.payload.profileIncomplete) {
                 navigate('/profile');
             } else {
                 navigate('/');
             }
-        } catch (err) {
-            setError(`Error occurred: ${err}`);
         }
     };
 
@@ -81,7 +84,7 @@ const Login: React.FC = () => {
                     />
                     {error && <Typography color="error">{error}</Typography>}
                     <Button type="submit" fullWidth variant="contained" color="primary" sx={{ mt: 3, backgroundColor: '#757575' }}>
-                        Login
+                        {status === Status.LOADING ? 'Logging in...' : 'Login'}
                     </Button>
                 </form>
 

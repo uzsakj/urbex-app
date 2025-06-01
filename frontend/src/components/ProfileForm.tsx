@@ -12,22 +12,24 @@ import {
     IconButton,
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-import { updateProfile, getProfile, createProfile } from '../services/api/profile';
-import { IProfile } from '../interfaces/profile.interface';
 import AddIcon from '@mui/icons-material/Add';
+import { Profile } from '../features/profile/types';
+import { useDispatch, useSelector } from 'react-redux';
+import { AppDispatch, RootState } from '../store';
+import { fetchProfile, saveProfile } from '../features/profile/profileSlice';
 
 const ProfileForm: React.FC = () => {
+    const dispatch = useDispatch<AppDispatch>();
     const navigate = useNavigate();
-    const [formData, setFormData] = useState<IProfile>({
+    const profile = useSelector((state: RootState) => state.profile)
+
+    const [formData, setFormData] = useState<Profile>(profile.data || {
         fullName: '',
         biography: '',
         province: '',
         avatarUrl: ''
     });
 
-
-    const [initialData, setInitialData] = useState<IProfile | null>(null);
-    const [profileExists, setProfileExists] = useState(false);
     const [avatarFile, setAvatarFile] = useState<File | null>(null);
     const [snackbarOpen, setSnackbarOpen] = useState(false);
     const [snackbarMessage, setSnackbarMessage] = useState('');
@@ -44,29 +46,20 @@ const ProfileForm: React.FC = () => {
     }, [avatarFile]);
 
     useEffect(() => {
-        const fetchProfile = async () => {
-            try {
-                const profile = await getProfile();
-                console.error(123, profile)
-                if (profile) {
-                    setFormData({
-                        fullName: profile.fullName || '',
-                        biography: profile.biography || '',
-                        province: profile.province || '',
-                        avatarUrl: profile.avatarUrl || '',
-                    });
-                    setInitialData(profile)
-                    setAvatarUrl(profile.avatarUrl || null);
-                    setProfileExists(true);
-                }
-            } catch (error) {
-                console.error('Error fetching profile:', error);
-                setProfileExists(false);
-            }
-        };
+        dispatch(fetchProfile());
+    }, [dispatch]);
 
-        fetchProfile();
-    }, []);
+    useEffect(() => {
+        if (profile.data) {
+            setFormData({
+                fullName: profile.data.fullName || '',
+                biography: profile.data.biography || '',
+                province: profile.data.province || '',
+                avatarUrl: profile.data.avatarUrl || '',
+            });
+            setAvatarUrl(profile.data.avatarUrl || '')
+        }
+    }, [profile.data])
 
     const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
@@ -87,9 +80,9 @@ const ProfileForm: React.FC = () => {
 
         try {
             const hasChanges = (
-                formData.fullName !== initialData?.fullName ||
-                formData.biography !== initialData?.biography ||
-                formData.province !== initialData?.province ||
+                formData.fullName !== profile.data?.fullName ||
+                formData.biography !== profile.data?.biography ||
+                formData.province !== profile.data?.province ||
                 avatarFile
             );
 
@@ -115,13 +108,10 @@ const ProfileForm: React.FC = () => {
             }
 
 
-            if (profileExists) {
-                await updateProfile(formDataToSend);
-            } else {
-                await createProfile(formDataToSend);
-            }
+            await dispatch(saveProfile(formDataToSend as Profile))
 
-            setSnackbarMessage(profileExists ? 'Profile updated successfully!' : 'Profile created successfully!');
+
+            setSnackbarMessage(profile.data ? 'Profile updated successfully!' : 'Profile created successfully!');
             setSnackbarSeverity('success');
             setSnackbarOpen(true);
             navigate('/');
@@ -267,3 +257,5 @@ const ProfileForm: React.FC = () => {
 };
 
 export default ProfileForm;
+
+

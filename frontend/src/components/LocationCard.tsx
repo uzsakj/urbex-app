@@ -9,15 +9,15 @@ import {
     Chip,
     Box,
 } from '@mui/material';
-import { ILocation } from '../interfaces/location.interface';
+import { Location } from '../features/location/types';
 
 interface LocationCardProps {
-    location: ILocation;
+    location: Location;
     onView: (id: string) => void;
 }
 
 const LocationCard: React.FC<LocationCardProps> = ({ location, onView }) => {
-    const { _id, name, description, photos, tags } = location;
+    const { _id, title, description, photos, tags } = location;
 
     return (
         <Card sx={{ minWidth: 275, m: 2 }}>
@@ -26,12 +26,12 @@ const LocationCard: React.FC<LocationCardProps> = ({ location, onView }) => {
                     component="img"
                     height="180"
                     image={photos[0]}
-                    alt={name}
+                    alt={title}
                 />
             )}
             <CardContent>
                 <Typography variant="h6" gutterBottom>
-                    {name}
+                    {title}
                 </Typography>
                 <Typography variant="body2" color="text.secondary" paragraph>
                     {description}

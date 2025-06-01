@@ -39,9 +39,9 @@ async function start() {
 
     // Routes
 
-    app.use('/api/register', registerRouter.default);
-    app.use('/api/login', loginRouter.default);
-    app.use('/api/logout', logoutRouter.default);
+    app.use('/auth/register', registerRouter.default);
+    app.use('/auth/login', loginRouter.default);
+    app.use('/auth/logout', logoutRouter.default);
     app.use('/api/profile', authenticateJWT, profileRouter.default);
     app.use('/api/location', authenticateJWT, locationRouter.default);
 

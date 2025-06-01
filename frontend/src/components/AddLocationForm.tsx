@@ -18,12 +18,15 @@ import {
 import AddIcon from '@mui/icons-material/Add';
 import CloseIcon from '@mui/icons-material/Close';
 import LocationPicker from './LocationPicker';
-import { createLocation } from '../services/api/location';
 import { Chip, OutlinedInput } from '@mui/material';
+import { createLocation } from '../features/location/locationSlice';
+import { AppDispatch } from '../store';
+import { useDispatch } from 'react-redux';
 
 const AddLocationForm = () => {
     const [activeStep, setActiveStep] = useState(0);
 
+    const dispatch = useDispatch<AppDispatch>();
     const [name, setName] = useState('');
     const [description, setDescription] = useState('');
     const [coordinates, setCoordinates] = useState<{ lat: number; lng: number } | null>(null);
@@ -62,7 +65,7 @@ const AddLocationForm = () => {
         setError('');
 
         try {
-            await createLocation(formData);
+            dispatch(createLocation(formData));
             setName('');
             setDescription('');
             setCoordinates(null);

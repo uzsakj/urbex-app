@@ -1,22 +1,30 @@
-export interface ILocation {
+import { Status } from "../../store/status.enum";
+
+export interface LocationState {
+    items: Location[];
+    status: Status;
+    error: string | null;
+}
+
+export interface Location {
     _id: string;
     title: string;
     description: string;
     coordinates: {
         type: 'Point';
-        coordinates: [number, number]; // [lng, lat]
+        coordinates: [number, number];
     };
-    createdBy: string; // ObjectId as string
+    createdBy: string;
     visibility: 'public' | 'friends' | 'private';
     photos: string[];
     ratings: {
-        user: string; // ObjectId as string
+        user: string;
         rating: number;
     }[];
     comments: {
-        user: string; // ObjectId as string
+        user: string;
         text: string;
-        createdAt: string; // Dates are usually strings in JSON
+        createdAt: string;
         updatedAt?: string;
     }[];
     tags: string[];

@@ -1,13 +1,14 @@
 import React from 'react';
 import { Button, Typography, Box } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-import { isAuthenticated } from '../services/api/auth.ts';
 import Dashboard from './Dashboard.tsx';
-import AddLocationForm from '../components/AddLocationForm.tsx';
+import { useSelector } from 'react-redux';
+import { RootState } from '../store/index.ts';
+import { Status } from '../store/status.enum.ts';
 
 const Home: React.FC = () => {
     const navigate = useNavigate();
-    const userAuthenticated = isAuthenticated();
+    const status = useSelector((state: RootState) => state.auth.status)
 
     const goToLogin = () => {
         navigate('/login');
@@ -37,7 +38,7 @@ const Home: React.FC = () => {
 
             }}
         >
-            {userAuthenticated ? (
+            {status === Status.SUCCEEDED ? (
 
                 <Dashboard />
             ) : (
