@@ -1,13 +1,13 @@
+import 'reflect-metadata';
 import express from 'express';
 import dotenv from 'dotenv';
-import { connectToDatabase } from './lib/dbConnection.ts';
+import { connectToDatabase } from './utils/dbConnection.ts';
 import bodyParser from 'body-parser';
 import cors from 'cors';
-const registerRouter = await import('./routes/register.ts');
-const loginRouter = await import('./routes/login.ts');
-const logoutRouter = await import('./routes/logout.ts');
-const profileRouter = await import('./routes/profile.ts');
-const locationRouter = await import('./routes/location.ts');
+const registerRouter = await import('./routes/RegisterRoutes.ts');
+const loginRouter = await import('./routes/LoginRoutes.ts');
+const profileRouter = await import('./routes/ProfileRoutes.ts');
+const locationRouter = await import('./routes/LocationRoutes.ts');
 const { authenticateJWT } = await import('./middleware/auth.ts');
 
 async function start() {
@@ -41,7 +41,6 @@ async function start() {
 
     app.use('/auth/register', registerRouter.default);
     app.use('/auth/login', loginRouter.default);
-    app.use('/auth/logout', logoutRouter.default);
     app.use('/api/profile', authenticateJWT, profileRouter.default);
     app.use('/api/location', authenticateJWT, locationRouter.default);
 
