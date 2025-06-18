@@ -1,13 +1,9 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
-import { Profile } from './types';
-import { getProfile, updateProfile } from './profileAPI';
+import { Profile, ProfileState } from './types';
+import * as api from './profileAPI';
 import { Status } from '../../store/status.enum';
 
-interface ProfileState {
-    data: Profile | null;
-    status: Status;
-    error: string | null;
-}
+
 
 const initialState: ProfileState = {
     data: null,
@@ -15,22 +11,22 @@ const initialState: ProfileState = {
     error: null,
 };
 
-export const fetchProfile = createAsyncThunk<Profile, void, { rejectValue: string }>(
+export const fetchProfile = createAsyncThunk<Profile, string, { rejectValue: string }>(
     'profile/fetch',
-    async (_, thunkAPI) => {
+    async (userId, thunkAPI) => {
         try {
-            return await getProfile();
+            return await api.getProfile(userId);
         } catch (err) {
             return thunkAPI.rejectWithValue(err.message || 'Failed to load profile');
         }
     }
 );
 
-export const saveProfile = createAsyncThunk<void, Partial<Profile>, { rejectValue: string }>(
+export const saveProfile = createAsyncThunk<void, FormData, { rejectValue: string }>(
     'profile/update',
     async (profileData, thunkAPI) => {
         try {
-            return await updateProfile(profileData);
+            return await api.updateProfile(profileData);
         } catch (err) {
             return thunkAPI.rejectWithValue(err.message || 'Failed to update profile');
         }

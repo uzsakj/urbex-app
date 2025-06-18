@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import { AuthState, LoginCredentials, RegisterCredentials, User } from './types';
-import { callLogin, callRegister } from './authAPI';
+import * as api from './authAPI';
 import { Status } from '../../store/status.enum';
 
 const savedUser = localStorage.getItem('user');
@@ -18,8 +18,9 @@ export const login = createAsyncThunk<
     'auth/login',
     async (credentials, thunkAPI) => {
         try {
-            const user = await callLogin(credentials);
+            const { user, token } = await api.login(credentials);
             localStorage.setItem('user', JSON.stringify(user));
+            localStorage.setItem('token', token);
             return user;
         } catch (error) {
             return thunkAPI.rejectWithValue(error.message);
@@ -35,7 +36,7 @@ export const register = createAsyncThunk<
     'auth/register',
     async (credentials, thunkAPI) => {
         try {
-            await callRegister(credentials);
+            await api.register(credentials);
         } catch (error) {
             return thunkAPI.rejectWithValue(error.message);
         }
@@ -55,7 +56,6 @@ const authSlice = createSlice({
     },
     extraReducers: (builder) => {
         builder
-            // login cases
             .addCase(login.pending, (state) => {
                 state.status = Status.LOADING;
                 state.error = null;
@@ -68,7 +68,6 @@ const authSlice = createSlice({
                 state.status = Status.FAILED;
                 state.error = action.payload || 'Login failed';
             })
-            // register cases
             .addCase(register.pending, (state) => {
                 state.status = Status.LOADING;
                 state.error = null;

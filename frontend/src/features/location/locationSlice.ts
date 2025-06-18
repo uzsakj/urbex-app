@@ -1,21 +1,32 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { Location, LocationState } from './types';
-import { fetchLocations as fetchLocationsAPI, createLocation as createLocationAPI } from './locationAPI';
+import { LocationResponse, LocationState } from './types';
+import * as api from './locationAPI';
 import { Status } from '../../store/status.enum';
 
 
 
 const initialState: LocationState = {
     items: [],
+    total: 0,
     status: Status.IDLE,
     error: null,
 };
 
-export const fetchLocations = createAsyncThunk<Location[], void, { rejectValue: string }>(
+export const fetchLocations = createAsyncThunk<LocationResponse, void, { rejectValue: string }>(
     'locations/fetchAll',
     async (_, thunkAPI) => {
         try {
-            return await fetchLocationsAPI();
+            return await api.fetchLocations();
+        } catch (err) {
+            return thunkAPI.rejectWithValue(err.message);
+        }
+    });
+
+export const fetchLocationsPaginated = createAsyncThunk<LocationResponse, { page?: number; limit?: number }, { rejectValue: string }>(
+    'locations/fetch',
+    async (params, thunkAPI) => {
+        try {
+            return await api.fetchLocationsPaginated(params);
         } catch (err) {
             return thunkAPI.rejectWithValue(err.message);
         }
@@ -25,7 +36,7 @@ export const createLocation = createAsyncThunk<void, FormData, { rejectValue: st
     'locations/',
     async (locationData, thunkAPI) => {
         try {
-            return await createLocationAPI(locationData);
+            return await api.createLocation(locationData);
         } catch (err) {
             return thunkAPI.rejectWithValue(err.message);
         }
@@ -41,11 +52,25 @@ const locationSlice = createSlice({
                 state.status = Status.LOADING;
                 state.error = null;
             })
-            .addCase(fetchLocations.fulfilled, (state, action: PayloadAction<Location[]>) => {
+            .addCase(fetchLocations.fulfilled, (state, action: PayloadAction<LocationResponse>) => {
                 state.status = Status.SUCCEEDED;
-                state.items = action.payload;
+                state.items = action.payload.data;
+                state.total = action.payload.total || 0;
             })
             .addCase(fetchLocations.rejected, (state, action) => {
+                state.status = Status.FAILED;
+                state.error = action.payload || 'Something went wrong';
+            })
+            .addCase(fetchLocationsPaginated.pending, state => {
+                state.status = Status.LOADING;
+                state.error = null;
+            })
+            .addCase(fetchLocationsPaginated.fulfilled, (state, action: PayloadAction<LocationResponse>) => {
+                state.status = Status.SUCCEEDED;
+                state.items = action.payload.data;
+                state.total = action.payload.total || 0;
+            })
+            .addCase(fetchLocationsPaginated.rejected, (state, action) => {
                 state.status = Status.FAILED;
                 state.error = action.payload || 'Something went wrong';
             });

@@ -3,7 +3,13 @@ import { Status } from "../../store/status.enum";
 export interface LocationState {
     items: Location[];
     status: Status;
+    total: number;
     error: string | null;
+}
+
+export interface LocationResponse {
+    data: Location[];
+    total?: number;
 }
 
 export interface Location {

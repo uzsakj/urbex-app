@@ -1,7 +1,7 @@
 import { Status } from "../../store/status.enum";
 
 export interface User {
-    id: number;
+    id: string;
     username: string;
     email: string;
     profileIncomplete: boolean
