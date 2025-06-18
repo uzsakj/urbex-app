@@ -1,4 +1,4 @@
-import React, { useState, useEffect, ChangeEvent, FormEvent } from 'react';
+import React, { useState, useEffect, FormEvent } from 'react';
 import {
     Box,
     Button,
@@ -17,7 +17,7 @@ import { Profile } from '../features/profile/types';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../store';
 import { fetchProfile, saveProfile } from '../features/profile/profileSlice';
-
+import { countries } from '../constants/countries';
 const ProfileForm: React.FC = () => {
     const dispatch = useDispatch<AppDispatch>();
     const navigate = useNavigate();
@@ -26,8 +26,11 @@ const ProfileForm: React.FC = () => {
     const [formData, setFormData] = useState<Profile>(profile.data || {
         fullName: '',
         biography: '',
-        province: '',
-        avatarUrl: ''
+        gender: '',
+        birthDate: '',
+        country: '',
+        city: '',
+        avatarUrl: '',
     });
 
     const [avatarFile, setAvatarFile] = useState<File | null>(null);
@@ -35,7 +38,7 @@ const ProfileForm: React.FC = () => {
     const [snackbarMessage, setSnackbarMessage] = useState('');
     const [snackbarSeverity, setSnackbarSeverity] = useState<'success' | 'error' | 'info'>('success');
     const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
-
+    const today = new Date().toISOString().split('T')[0];
     useEffect(() => {
         if (avatarFile) {
             const objectUrl = URL.createObjectURL(avatarFile);
@@ -46,7 +49,7 @@ const ProfileForm: React.FC = () => {
     }, [avatarFile]);
 
     useEffect(() => {
-        dispatch(fetchProfile());
+        dispatch(fetchProfile('me'));
     }, [dispatch]);
 
     useEffect(() => {
@@ -54,14 +57,20 @@ const ProfileForm: React.FC = () => {
             setFormData({
                 fullName: profile.data.fullName || '',
                 biography: profile.data.biography || '',
-                province: profile.data.province || '',
+                gender: profile.data.gender || '',
+                birthDate: profile.data.birthDate || '',
+                country: profile.data.country || '',
+                city: profile.data.city || '',
                 avatarUrl: profile.data.avatarUrl || '',
             });
             setAvatarUrl(profile.data.avatarUrl || '')
         }
     }, [profile.data])
 
-    const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+
+    const handleInputChange = (
+        e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    ) => {
         const { name, value } = e.target;
         setFormData((prev) => ({ ...prev, [name]: value }));
     };
@@ -70,7 +79,7 @@ const ProfileForm: React.FC = () => {
     const handleSubmit = async (e: FormEvent) => {
         e.preventDefault();
 
-        const authToken = localStorage.getItem('authToken');
+        const authToken = localStorage.getItem('token');
         if (!authToken) {
             setSnackbarMessage('You must be logged in to update your profile.');
             setSnackbarSeverity('error');
@@ -82,7 +91,9 @@ const ProfileForm: React.FC = () => {
             const hasChanges = (
                 formData.fullName !== profile.data?.fullName ||
                 formData.biography !== profile.data?.biography ||
-                formData.province !== profile.data?.province ||
+                formData.country !== profile.data?.country ||
+                formData.birthDate !== profile.data?.birthDate ||
+                formData.city !== profile.data?.city ||
                 avatarFile
             );
 
@@ -100,21 +111,31 @@ const ProfileForm: React.FC = () => {
             if (formData.biography !== undefined) {
                 formDataToSend.append('biography', formData.biography);
             }
-            if (formData.province !== undefined) {
-                formDataToSend.append('province', formData.province);
+            if (formData.gender !== undefined) {
+                formDataToSend.append('gender', formData.gender);
             }
+            if (formData.birthDate !== undefined) {
+                formDataToSend.append('birthDate', formData.birthDate);
+            }
+            if (formData.country !== undefined) {
+                formDataToSend.append('country', formData.country);
+            }
+            if (formData.city !== undefined) {
+                formDataToSend.append('city', formData.city);
+            }
+
             if (avatarFile) {
                 formDataToSend.append('avatar', avatarFile, avatarFile.name);
             }
 
 
-            await dispatch(saveProfile(formDataToSend as Profile))
+            await dispatch(saveProfile(formDataToSend))
 
 
             setSnackbarMessage(profile.data ? 'Profile updated successfully!' : 'Profile created successfully!');
             setSnackbarSeverity('success');
             setSnackbarOpen(true);
-            navigate('/');
+            navigate('/dashboard');
         } catch (error) {
             console.error(error);
             setSnackbarMessage(`Something went wrong. ${error}`);
@@ -124,7 +145,7 @@ const ProfileForm: React.FC = () => {
     };
 
     const handleSkip = () => {
-        navigate('/');
+        navigate('/dashboard');
     };
 
     const handleSnackbarClose = () => {
@@ -136,6 +157,9 @@ const ProfileForm: React.FC = () => {
             sx={{
                 width: '100vw',
                 height: '100vh',
+                overflow: 'auto',
+                padding: 2,
+                boxSizing: 'border-box',
                 display: 'flex',
                 justifyContent: 'center',
                 alignItems: 'center',
@@ -198,32 +222,88 @@ const ProfileForm: React.FC = () => {
                         label="Full Name"
                         name="fullName"
                         value={formData.fullName}
-                        onChange={handleChange}
+                        onChange={handleInputChange}
                         fullWidth
                         margin="normal"
                         variant="outlined"
+                        slotProps={{ inputLabel: { shrink: Boolean(formData.fullName) } }}
+                    />
+
+                    <TextField
+                        select
+                        label="Gender"
+                        name="gender"
+                        value={formData.gender}
+                        onChange={handleInputChange}
+                        fullWidth
+                        margin="normal"
+                        variant="outlined"
+                        slotProps={{ select: { native: true }, inputLabel: { shrink: Boolean(formData.gender) } }}
+
+                    >
+                        <option value="" disabled></option>
+                        <option value="male">Male</option>
+                        <option value="female">Female</option>
+                        <option value="non-binary">Non-binary</option>
+                        <option value="other">Other</option>
+                    </TextField>
+
+                    <TextField
+                        label="Date of Birth"
+                        type="date"
+                        name="birthDate"
+                        value={formData.birthDate}
+                        onChange={handleInputChange}
+                        fullWidth
+                        margin="normal"
+                        variant="outlined"
+                        slotProps={{
+                            inputLabel: { shrink: true },
+                            htmlInput: { max: today }
+                        }}
+                    />
+
+                    <TextField
+                        select
+                        label="Country"
+                        name="country"
+                        value={formData.country}
+                        onChange={handleInputChange}
+                        fullWidth
+                        margin="normal"
+                        variant="outlined"
+                        slotProps={{ select: { native: true }, inputLabel: { shrink: Boolean(formData.gender) } }}
+                    >
+                        <option value="" disabled></option>
+                        {countries.map((country) => (
+                            <option key={country} value={country}>
+                                {country}
+                            </option>
+                        ))}
+                    </TextField>
+
+                    <TextField
+                        label="City"
+                        name="city"
+                        value={formData.city}
+                        onChange={handleInputChange}
+                        fullWidth
+                        margin="normal"
+                        variant="outlined"
+                        slotProps={{ inputLabel: { shrink: Boolean(formData.fullName) } }}
                     />
 
                     <TextField
                         label="Biography"
                         name="biography"
                         value={formData.biography}
-                        onChange={handleChange}
+                        onChange={handleInputChange}
                         fullWidth
                         multiline
                         rows={4}
                         margin="normal"
                         variant="outlined"
-                    />
-
-                    <TextField
-                        label="Province"
-                        name="province"
-                        value={formData.province}
-                        onChange={handleChange}
-                        fullWidth
-                        margin="normal"
-                        variant="outlined"
+                        slotProps={{ inputLabel: { shrink: Boolean(formData.fullName) } }}
                     />
 
                     <Button
@@ -235,6 +315,7 @@ const ProfileForm: React.FC = () => {
                     >
                         Save Profile
                     </Button>
+
                     <Button
                         onClick={handleSkip}
                         variant="contained"
