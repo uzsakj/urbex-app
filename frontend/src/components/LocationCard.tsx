@@ -3,24 +3,20 @@ import {
     Card,
     CardContent,
     Typography,
-    CardActions,
-    Button,
     CardMedia,
-    Chip,
-    Box,
+    Chip
 } from '@mui/material';
 import { Location } from '../features/location/types';
 
 interface LocationCardProps {
     location: Location;
-    onView: (id: string) => void;
 }
 
-const LocationCard: React.FC<LocationCardProps> = ({ location, onView }) => {
+const LocationCard: React.FC<LocationCardProps> = ({ location }) => {
     const { _id, title, description, photos, tags } = location;
 
     return (
-        <Card sx={{ minWidth: 275, m: 2 }}>
+        <Card sx={{ width: '100%', flexShrink: 1, flexGrow: 0, m: 2 }}>
             {photos && photos.length > 0 && (
                 <CardMedia
                     component="img"
@@ -36,15 +32,14 @@ const LocationCard: React.FC<LocationCardProps> = ({ location, onView }) => {
                 <Typography variant="body2" color="text.secondary" paragraph>
                     {description}
                 </Typography>
-                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mt: 1 }}>
-                    {tags.map((tag, idx) => (
+                {tags.length > 0 ? (
+                    tags.map((tag, idx) => (
                         <Chip key={idx} label={tag} size="small" />
-                    ))}
-                </Box>
+                    ))
+                ) : (
+                    <Chip size="small" sx={{ visibility: 'hidden' }} />
+                )}
             </CardContent>
-            <CardActions>
-                <Button size="small" onClick={() => onView(_id)}>View</Button>
-            </CardActions>
         </Card>
     );
 };

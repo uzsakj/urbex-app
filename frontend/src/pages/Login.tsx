@@ -23,9 +23,9 @@ const Login: React.FC = () => {
 
         if (login.fulfilled.match(resultAction)) {
             if (resultAction.payload.profileIncomplete) {
-                navigate('/profile');
+                navigate('/profile/me');
             } else {
-                navigate('/');
+                navigate('/dashboard');
             }
         }
     };
@@ -64,7 +64,6 @@ const Login: React.FC = () => {
                 <form onSubmit={handleSubmit}>
                     <TextField
                         margin="normal"
-                        required
                         fullWidth
                         label="Email Address"
                         variant="filled"
@@ -74,7 +73,6 @@ const Login: React.FC = () => {
                     />
                     <TextField
                         margin="normal"
-                        required
                         fullWidth
                         label="Password"
                         variant="filled"

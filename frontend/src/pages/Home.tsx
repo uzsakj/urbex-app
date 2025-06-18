@@ -1,14 +1,9 @@
 import React from 'react';
 import { Button, Typography, Box } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-import Dashboard from './Dashboard.tsx';
-import { useSelector } from 'react-redux';
-import { RootState } from '../store/index.ts';
-import { Status } from '../store/status.enum.ts';
 
 const Home: React.FC = () => {
     const navigate = useNavigate();
-    const status = useSelector((state: RootState) => state.auth.status)
 
     const goToLogin = () => {
         navigate('/login');
@@ -19,61 +14,61 @@ const Home: React.FC = () => {
     };
 
 
+
     return (
         <Box
             sx={{
-                width: '100vw',
-                height: '100vh',
+                flexGrow: 1,
+                minHeight: '100vh',
+                width: '100%',
                 display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
                 flexDirection: 'column',
-                textAlign: 'center',
-                position: 'relative',
                 backgroundImage: 'url(/urbex.jpg)',
                 backgroundSize: 'cover',
                 backgroundPosition: 'center',
                 backgroundRepeat: 'no-repeat',
-                overflow: 'hidden',
+                justifyContent: 'center',
+                alignItems: 'center',
 
             }}
         >
-            {status === Status.SUCCEEDED ? (
+            <Box
+                sx={{
+                    backgroundColor: 'rgba(255, 254, 254, 1)',
+                    padding: '20px',
+                    borderRadius: '8px',
+                    textShadow: '2px 2px 4px rgba(0, 0, 0, 0.4)',
+                    width: '100%',
+                    maxWidth: 400,
+                    mx: 'auto',
+                    mt: 4,
+                    boxSizing: 'border-box',
+                }}
+            >
+                <Typography variant="h4" gutterBottom>
+                    Welcome to UrbexHub
+                </Typography>
+                <Typography variant="body1" gutterBottom>
+                    Please log in or sign up to continue.
+                </Typography>
 
-                <Dashboard />
-            ) : (
-                <Box
-                    sx={{
-                        backgroundColor: 'rgba(255, 254, 254, 1)',
-                        padding: '20px',
-                        borderRadius: '8px',
-                        textShadow: '2px 2px 4px rgba(0, 0, 0, 0.4)',
-                    }}
+                <Button
+                    variant="contained"
+                    sx={{ mt: 2, width: '100%', backgroundColor: '#757575' }}
+                    onClick={goToLogin}
                 >
-                    <Typography variant="h4" gutterBottom>
-                        Welcome to UrbexHub
-                    </Typography>
-                    <Typography variant="body1" gutterBottom>
-                        Please log in or sign up to continue.
-                    </Typography>
+                    Log in
+                </Button>
 
-                    <Button
-                        variant="contained"
-                        sx={{ mt: 2, width: '100%', backgroundColor: '#757575' }}
-                        onClick={goToLogin}
-                    >
-                        Log in
-                    </Button>
+                <Button
+                    variant="contained"
+                    sx={{ mt: 2, width: '100%', backgroundColor: '#03a9f4' }}
+                    onClick={goToRegister}
+                >
+                    Sign Up
+                </Button>
+            </Box>
 
-                    <Button
-                        variant="contained"
-                        sx={{ mt: 2, width: '100%', backgroundColor: '#03a9f4' }}
-                        onClick={goToRegister}
-                    >
-                        Sign Up
-                    </Button>
-                </Box>
-            )}
         </Box>
     );
 };

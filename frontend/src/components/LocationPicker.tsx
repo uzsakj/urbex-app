@@ -56,9 +56,12 @@ const LocationPicker = ({ coordinates, setCoordinates }: LocationPickerProps) =>
 
     return (
         <Box sx={{ mt: 3 }}>
-            <Button onClick={handleUseCurrentLocation} variant="outlined" size="small" sx={{ mb: 1 }}>
-                Use Current Location
-            </Button>
+            <Box sx={{ textAlign: 'center' }}>
+
+                <Button onClick={handleUseCurrentLocation} variant="outlined" size="small" sx={{ mb: 1 }}>
+                    Use Current Location
+                </Button>
+            </Box>
 
             <Box sx={{ height: 300, border: '1px solid #ccc', borderRadius: 2, overflow: 'hidden' }}>
                 <MapContainer

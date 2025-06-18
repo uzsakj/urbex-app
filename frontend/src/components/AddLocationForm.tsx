@@ -29,7 +29,7 @@ const AddLocationForm = () => {
     const dispatch = useDispatch<AppDispatch>();
     const [name, setName] = useState('');
     const [description, setDescription] = useState('');
-    const [coordinates, setCoordinates] = useState<{ lat: number; lng: number } | null>(null);
+    const [coordinates, setCoordinates] = useState<{ lng: number; lat: number } | null>(null);
     const [visibility, setVisibility] = useState('public');
     const [photos, setPhotos] = useState<File[]>([]);
     const [previews, setPreviews] = useState<string[]>([]);
@@ -53,9 +53,13 @@ const AddLocationForm = () => {
 
     const handleSubmit = async () => {
         const formData = new FormData();
+        const geojsonPoint = {
+            type: "Point",
+            coordinates: [coordinates!.lng, coordinates!.lat],
+        };
         formData.append('name', name);
         formData.append('description', description);
-        formData.append('coordinates', JSON.stringify(coordinates));
+        formData.append('coordinates', JSON.stringify(geojsonPoint));
         formData.append('visibility', visibility);
         formData.append('tags', tags.join(','));
 
@@ -95,7 +99,7 @@ const AddLocationForm = () => {
                             value={name}
                             onChange={(e) => setName(e.target.value)}
                             required
-                            sx={{ mb: 2 }}
+                            sx={{ mb: 2, }}
                         />
                         <TextField
                             label="Description"
@@ -121,37 +125,44 @@ const AddLocationForm = () => {
                             </Select>
                         </FormControl >
 
-                        <OutlinedInput
-                            fullWidth
-                            value={tagInput}
-                            onChange={(e) => setTagInput(e.target.value)}
-                            onKeyDown={(e) => {
-                                if (e.key === 'Enter' && tagInput.trim()) {
-                                    e.preventDefault();
-                                    const trimmed = tagInput.trim();
-                                    if (!tags.includes(trimmed)) {
-                                        setTags([...tags, trimmed]);
-                                    }
-                                    setTagInput('');
-                                }
-                            }}
-                            placeholder="Add a tag and press Enter"
-                            startAdornment={
-                                <>
-                                    {tags.map((tag, index) => (
-                                        <Chip
-                                            key={index}
-                                            label={tag}
-                                            onDelete={() => {
-                                                setTags(tags.filter((_, i) => i !== index));
-                                            }}
-                                            sx={{ m: 0.5 }}
-                                        />
-                                    ))}
-                                </>
-                            }
-                        />
+                        <Box sx={{ width: '100%' }}>
 
+
+                            <OutlinedInput
+                                fullWidth
+                                value={tagInput}
+                                onChange={(e) => setTagInput(e.target.value)}
+                                onKeyDown={(e) => {
+                                    if (e.key === 'Enter' && tagInput.trim()) {
+                                        e.preventDefault();
+                                        const trimmed = tagInput.trim();
+                                        if (!tags.includes(trimmed)) {
+                                            setTags([...tags, trimmed]);
+                                        }
+                                        setTagInput('');
+                                    }
+                                }}
+                                placeholder="Add a tag and press Enter"
+                            />
+                        </Box>
+                        <Box
+                            sx={{
+                                display: 'flex',
+                                flexWrap: 'wrap',
+                                gap: 1,
+                                m: 1,
+                            }}
+                        >
+                            {tags.map((tag, index) => (
+                                <Chip
+                                    key={index}
+                                    label={tag}
+                                    onDelete={() => {
+                                        setTags(tags.filter((_, i) => i !== index));
+                                    }}
+                                />
+                            ))}
+                        </Box>
                         {<Typography color="error" sx={{ mt: 2, display: 'flex' }}>*Required field</Typography>}
 
 
@@ -232,10 +243,16 @@ const AddLocationForm = () => {
 
     return (
         <Box sx={{
-            width: '100%', maxWidth: '700px', mx: 'auto', mt: 5, p: 3,
-            borderRadius: 2, boxShadow: 3, backgroundColor: 'rgba(255, 254, 254, 1)',
+            width: '100%',
+            maxWidth: '700px',
+            borderRadius: 2,
+            boxShadow: 3,
+            backgroundColor: 'rgba(255, 254, 254, 1)',
+            mx: 'auto',
+            mt: 5,
+            p: 3,
         }}>
-            <Typography variant="h5" gutterBottom>Add New Location</Typography>
+            <Typography variant="h5" gutterBottom sx={{ textAlign: 'center', width: '100%' }}>Add New Location</Typography>
             <Stepper activeStep={activeStep} alternativeLabel sx={{ mb: 4 }}>
                 {steps.map((label) => (
                     <Step key={label}>
