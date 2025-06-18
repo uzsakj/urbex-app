@@ -111,3 +111,19 @@ export const handleDeleteLocation = async (req: AuthenticatedRequest, res: Respo
         return httpResponse(500, "Failed to delete location", { error }, res);
     }
 };
+
+export const handleSearchLocations = async (req: Request, res: Response) => {
+    const query = req.query.q as string;
+
+    if (!query || query.trim() === '') {
+        return res.status(400).json({ message: 'Search query is required' });
+    }
+
+    try {
+        const results = await locationService.searchLocations(query);
+        return httpResponse(200, "Location fetched successfully", results, res);
+    } catch (error) {
+        console.error(error);
+        return httpResponse(500, "Failed to search locations", { error }, res);
+    }
+};

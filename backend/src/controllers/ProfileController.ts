@@ -5,9 +5,10 @@ import { AuthenticatedRequest } from '../middleware/auth.ts';
 
 const profileService = new ProfileService();
 
-export const getProfile = async (req: AuthenticatedRequest, res: Response) => {
+export const handleGetProfile = async (req: AuthenticatedRequest, res: Response) => {
     try {
-        const profile = await profileService.getProfileByUserId(req.user.id);
+        const userId = req.params.userId === 'me' ? req.user.id : req.params.userId;
+        const profile = await profileService.getProfileByUserId(userId);
         if (!profile) return httpResponse(404, 'Profile not found', null, res);
         return httpResponse(200, 'Profile fetched successfully', profile, res);
     } catch (error) {
@@ -16,10 +17,11 @@ export const getProfile = async (req: AuthenticatedRequest, res: Response) => {
     }
 };
 
-export const updateProfile = async (req: AuthenticatedRequest, res: Response) => {
+export const handleUpdateProfile = async (req: AuthenticatedRequest, res: Response) => {
     try {
         const data = { ...req.body, user: { id: req.user.id } };
-        const profile = await profileService.createOrUpdateProfile(data);
+        const file = req.file;
+        const profile = await profileService.createOrUpdateProfile(data, file);
         return httpResponse(200, 'Profile updated successfully', profile, res);
     } catch (error) {
         console.error(error);
@@ -27,7 +29,7 @@ export const updateProfile = async (req: AuthenticatedRequest, res: Response) =>
     }
 };
 
-export const deleteProfile = async (req: AuthenticatedRequest, res: Response) => {
+export const handleDeleteProfile = async (req: AuthenticatedRequest, res: Response) => {
     try {
         await profileService.deleteProfileByUserId(req.user.id);
         return httpResponse(200, 'Profile deleted successfully', null, res);

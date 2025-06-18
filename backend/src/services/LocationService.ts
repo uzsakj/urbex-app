@@ -55,26 +55,49 @@ export class LocationService {
         const friendIds = await this.userService.getFriendsOfUser(userId);
         const offset = (page - 1) * limit;
 
-        const query = this.locationRepository
+        const countQuery = this.locationRepository
+            .createQueryBuilder('location')
+            .where('location.visibility = :public', { public: 'public' })
+            .orWhere('location.createdById = :userId', { userId }); // assuming FK column is location.createdById
+
+        if (friendIds.length > 0) {
+            countQuery.orWhere('location.visibility = :friends AND location.createdById IN (:...friendIds)', {
+                friends: 'friends',
+                friendIds,
+            });
+        }
+
+        const total = await countQuery.getCount();
+
+        const dataQuery = this.locationRepository
             .createQueryBuilder('location')
             .leftJoinAndSelect('location.createdBy', 'creator')
             .where('location.visibility = :public', { public: 'public' })
             .orWhere('creator.id = :userId', { userId });
 
         if (friendIds.length > 0) {
-            query.orWhere('location.visibility = :friends AND creator.id IN (:...friendIds)', {
+            dataQuery.orWhere('location.visibility = :friends AND creator.id IN (:...friendIds)', {
                 friends: 'friends',
                 friendIds,
             });
         }
 
-        const locations = await query
+        const data = await dataQuery
             .orderBy('location.createdAt', 'DESC')
             .skip(offset)
             .take(limit)
             .getMany();
 
-        return { data: locations, total: locations.length };
+        return { data, total };
+    }
+
+    public async searchLocations(query: string): Promise<Location[]> {
+        return await this.locationRepository
+            .createQueryBuilder('location')
+            .where('LOWER(location.name) LIKE :q OR LOWER(location.description) LIKE :q', {
+                q: `%${query.toLowerCase()}%`,
+            })
+            .getMany();
     }
 }
 

@@ -16,16 +16,24 @@ import { Comment } from './Comment.ts';
 import { Profile } from './Profile.ts';
 import { Friendship } from './Friendship.ts';
 
+export type Visibility = 'public' | 'private' | 'friends';
+
 @Entity()
 export class User {
     @PrimaryGeneratedColumn('uuid')
     id: string;
 
-    @Column({ unique: true })
+    @Column({ type: 'varchar', unique: true })
     username: string;
 
-    @Column({ unique: true })
+    @Column({ type: 'varchar', unique: true })
     email: string;
+
+    @Column({ type: 'enum', enum: ['public', 'private', 'friends'], default: 'friends' })
+    friendListVisibility: Visibility;
+
+    @Column({ type: 'enum', enum: ['public', 'private', 'friends'], default: 'friends' })
+    locationListVisibility: Visibility;
 
     @Column()
     passwordHash: string;

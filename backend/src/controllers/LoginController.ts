@@ -29,7 +29,7 @@ export const handleLogin = async (req: Request, res: Response) => {
                 id: user.id,
                 username: user.username,
                 email: user.email,
-                profileIncomplete: !!profile
+                profileIncomplete: !profile
             },
             token
         });

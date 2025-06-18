@@ -8,6 +8,9 @@ const registerRouter = await import('./routes/RegisterRoutes.ts');
 const loginRouter = await import('./routes/LoginRoutes.ts');
 const profileRouter = await import('./routes/ProfileRoutes.ts');
 const locationRouter = await import('./routes/LocationRoutes.ts');
+const friendshipRouter = await import('./routes/FriendshipRoutes.ts');
+const notificationRouter = await import('./routes/NotificationRoutes.ts');
+const userRouter = await import('./routes/UserController.ts');
 const { authenticateJWT } = await import('./middleware/auth.ts');
 
 async function start() {
@@ -43,11 +46,14 @@ async function start() {
     app.use('/auth/login', loginRouter.default);
     app.use('/api/profile', authenticateJWT, profileRouter.default);
     app.use('/api/location', authenticateJWT, locationRouter.default);
-
+    app.use('/api/friends', authenticateJWT, friendshipRouter.default);
+    app.use('/api/notification', authenticateJWT, notificationRouter.default);
+    app.use('/api/users', authenticateJWT, userRouter.default);
 
     app.listen(process.env.PORT, () => {
         console.log('Server is running on port ' + process.env.PORT);
     });
+
 }
 
 start();

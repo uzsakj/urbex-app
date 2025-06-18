@@ -26,8 +26,17 @@ export class Profile {
     @Column({ type: 'text', nullable: true })
     biography?: string;
 
+    @Column({ type: 'date', nullable: true })
+    birthDate: Date
+
     @Column({ type: 'varchar', nullable: true })
-    province?: string;
+    gender?: string
+
+    @Column({ type: 'varchar', nullable: true })
+    country: string
+
+    @Column({ type: 'varchar', nullable: true })
+    city: string
 
     @Column({ type: 'varchar', nullable: true })
     avatarUrl?: string;

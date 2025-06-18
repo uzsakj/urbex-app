@@ -37,7 +37,7 @@ export class UserService {
         );
     }
 
-    public async registerUser(data: { username: string; email: string; password: string }) {
+    public async registerUser(data: { username: string; email: string; password: string }): Promise<User> {
         const user = this.userRepository.create({
             username: data.username,
             email: data.email,
@@ -49,4 +49,18 @@ export class UserService {
         return await this.userRepository.save(user);
     }
 
-}
+    public async searchUsers(query: string) {
+        const repo = AppDataSource.getRepository(User);
+
+        return repo.createQueryBuilder('user')
+            .leftJoinAndSelect('user.profile', 'profile')
+            .where('LOWER(profile.fullName) LIKE :query', { query: `%${query.toLowerCase()}%` })
+            .select([
+                'user.id',
+                'profile.fullName',
+                'profile.avatarUrl',
+            ])
+            .getMany();
+    }
+};
+
