@@ -5,7 +5,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../store/index.ts';
 import { register } from '../features/auth/authSlice.ts';
 import { Status } from '../store/status.enum.ts';
-import { showSnackbar, SnackbarSeverity } from '../features/ui/uiSlice.ts';
+import { showSnackbar } from '../features/ui/uiSlice.ts';
+import { SnackbarSeverity } from '../features/ui/types.ts';
 
 const Register: React.FC = () => {
     const dispatch = useDispatch<AppDispatch>();
