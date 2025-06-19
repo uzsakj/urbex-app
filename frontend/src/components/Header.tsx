@@ -40,7 +40,6 @@ const Header: React.FC = () => {
         { text: 'Home', to: '/' },
         { text: 'Profile', to: '/profile/me' },
         { text: 'Dashboard', to: '/dashboard' },
-        { text: 'Edit Profile', to: '/editProfile' },
         { text: 'Add Location', to: '/addLocation' },
         {
             text: 'Logout',
@@ -103,7 +102,7 @@ const Header: React.FC = () => {
             <AppBar position="fixed" sx={{ width: '100%', zIndex: (theme) => theme.zIndex.drawer + 1 }}>
                 <Toolbar sx={{ justifyContent: 'space-between' }}>
                     <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                        <IconButton color="inherit" onClick={toggleDrawer(true)} sx={{ mr: 2 }}>
+                        <IconButton color="inherit" onClick={toggleDrawer(!drawerOpen)} sx={{ mr: 2 }}>
                             <MenuIcon />
                         </IconButton>
                         <Typography variant="h6" noWrap>

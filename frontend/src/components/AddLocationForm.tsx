@@ -9,7 +9,6 @@ import {
     Stepper,
     Step,
     StepLabel,
-    Snackbar,
     MenuItem,
     Select,
     FormControl,
@@ -22,6 +21,8 @@ import { Chip, OutlinedInput } from '@mui/material';
 import { createLocation } from '../features/location/locationSlice';
 import { AppDispatch } from '../store';
 import { useDispatch } from 'react-redux';
+import { showSnackbar } from '../features/ui/uiSlice';
+import { SnackbarSeverity } from '../features/ui/types';
 
 const AddLocationForm = () => {
     const [activeStep, setActiveStep] = useState(0);
@@ -34,11 +35,8 @@ const AddLocationForm = () => {
     const [photos, setPhotos] = useState<File[]>([]);
     const [previews, setPreviews] = useState<string[]>([]);
     const [loading, setLoading] = useState(false);
-    const [error, setError] = useState('');
     const [tags, setTags] = useState<string[]>([]);
     const [tagInput, setTagInput] = useState('');
-    const [openSnackbar, setOpenSnackbar] = useState<boolean>(false);
-    const [snackbarMessage, setSnackbarMessage] = useState<string>('');
 
     const steps = ['Details', 'Pick Location', 'Upload Photos'];
 
@@ -66,7 +64,6 @@ const AddLocationForm = () => {
         photos.forEach((photo) => formData.append('photos', photo));
 
         setLoading(true);
-        setError('');
 
         try {
             dispatch(createLocation(formData));
@@ -77,11 +74,10 @@ const AddLocationForm = () => {
             setTags([]);
             setPhotos([]);
             setPreviews([]);
-            setSnackbarMessage('Location added successfully');
-            setOpenSnackbar(true);
+            dispatch(showSnackbar({ message: 'Location added successfully', severity: SnackbarSeverity.SUCCESS }))
             setActiveStep(0);
         } catch {
-            setError('Failed to add location');
+            dispatch(showSnackbar({ message: 'Failed to add location', severity: SnackbarSeverity.ERROR }))
         } finally {
             setLoading(false);
         }
@@ -264,8 +260,6 @@ const AddLocationForm = () => {
             <Box component="div">
                 {renderStepContent(activeStep)}
 
-                {error && <Typography color="error" sx={{ mt: 2 }}>{error}</Typography>}
-
                 <Box sx={{ mt: 4, display: 'flex', justifyContent: 'space-between' }}>
                     <Button
                         type="button"
@@ -294,12 +288,7 @@ const AddLocationForm = () => {
                     )}
                 </Box>
             </Box>
-            <Snackbar
-                open={openSnackbar}
-                autoHideDuration={5000}
-                onClose={() => setOpenSnackbar(false)}
-                message={snackbarMessage}
-            />
+
         </Box>
     );
 };

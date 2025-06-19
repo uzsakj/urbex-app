@@ -35,13 +35,12 @@ const MapCenterUpdater = ({ center }: { center: { lat: number; lng: number } }) 
 const LocationPicker = ({ coordinates, setCoordinates }: LocationPickerProps) => {
     const [center, setCenter] = useState<{ lat: number; lng: number }>({ lat: 47.4979, lng: 19.0402 });
 
-    // Accessing the map instance directly inside the MapContainer
     const handleUseCurrentLocation = () => {
         navigator.geolocation.getCurrentPosition(
             (pos) => {
                 const coords = { lat: pos.coords.latitude, lng: pos.coords.longitude };
-                setCenter(coords);  // Update state to reflect the current location
-                setCoordinates(coords);  // Update parent state with the current location
+                setCenter(coords);
+                setCoordinates(coords);
             },
             (err) => {
                 console.error(err);

@@ -1,11 +1,13 @@
-import { Avatar, Badge, Box, Button, Paper, Typography } from '@mui/material'
+import { Avatar, Badge, Box, Button, IconButton, Modal, Paper, Typography } from '@mui/material'
 import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { AppDispatch, RootState } from '../store'
 import { fetchProfile } from '../features/profile/profileSlice'
 import { useParams } from 'react-router-dom'
+import EditIcon from '@mui/icons-material/Edit';
 import { fetchFriends, requestFriend } from '../features/friendship/friendSlice'
 import { fetchLocations } from '../features/location/locationSlice'
+import ProfileForm from '../components/ProfileForm'
 
 const Profile: React.FC = () => {
 
@@ -15,6 +17,9 @@ const Profile: React.FC = () => {
     const user = useSelector((state: RootState) => state.auth.user)
     const friends = useSelector((state: RootState) => state.friends.friends)
     const locations = useSelector((state: RootState) => state.locations)
+    const [isProfileFormOpen, setIsProfileFormOpen] = useState(false);
+    const handleOpen = () => setIsProfileFormOpen(true);
+    const handleClose = () => setIsProfileFormOpen(false);
 
     const [avatarUrl, setAvatarUrl] = useState<string | null>(null)
     const { userId } = useParams()
@@ -35,6 +40,12 @@ const Profile: React.FC = () => {
             setAvatarUrl(profile.data.avatarUrl || null)
         }
     }, [profile.data])
+
+    useEffect(() => {
+        if (user?.profileIncomplete) {
+            setIsProfileFormOpen(true)
+        }
+    }, [user])
 
 
     return (
@@ -57,14 +68,21 @@ const Profile: React.FC = () => {
                 }}
             >
                 <Paper sx={{ flex: 1, padding: 2 }}>
+
                     <Badge sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+
                         <Avatar
                             src={avatarUrl || undefined}
                             sx={{ width: 100, height: 100, mb: 1 }}
                         />
 
-                        <Typography variant="h6" gutterBottom>
+                        <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center' }}>
                             {profile.data?.fullName}
+                            {isOwnProfile && <IconButton
+                                onClick={handleOpen}
+                            >
+                                <EditIcon />
+                            </IconButton>}
                         </Typography>
 
                         {profile.data?.biography && (
@@ -107,6 +125,25 @@ const Profile: React.FC = () => {
 
 
                 </Paper>
+                <Modal open={isProfileFormOpen} onClose={handleClose}>
+                    <Box
+                        sx={{
+                            position: 'absolute',
+                            top: '50%',
+                            left: '50%',
+                            transform: 'translate(-50%, -50%)',
+                            bgcolor: 'background.paper',
+                            boxShadow: 24,
+                            borderRadius: 2,
+                            p: 4,
+                            width: '30vw',
+                            height: '90vh',
+                            overflowY: 'auto',
+                        }}
+                    >
+                        <ProfileForm onClose={() => setIsProfileFormOpen(false)} />
+                    </Box>
+                </Modal>
                 <Paper sx={{ flex: 2, padding: 2 }}>
                     <Box display="flex" justifyContent="space-between" alignItems="center" mb={1}>
                         <Typography variant="h6">Friends {friends.length}</Typography>

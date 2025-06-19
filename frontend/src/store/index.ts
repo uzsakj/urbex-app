@@ -5,6 +5,7 @@ import profileReducer from '../features/profile/profileSlice';
 import friendsReducer from '../features/friendship/friendSlice';
 import notificationReducer from '../features/notification/notificationSlice';
 import searchReducer from '../features/search/searchSlice';
+import uiReducer from '../features/ui/uiSlice';
 
 export const store = configureStore({
     reducer: {
@@ -13,7 +14,8 @@ export const store = configureStore({
         profile: profileReducer,
         friends: friendsReducer,
         notifications: notificationReducer,
-        search: searchReducer
+        search: searchReducer,
+        ui: uiReducer
     },
 });
 

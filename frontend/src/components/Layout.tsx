@@ -1,12 +1,18 @@
 import React from 'react'
 import Header from './Header'
-import { Box, Toolbar } from '@mui/material'
+import { Alert, Box, Snackbar, Toolbar } from '@mui/material'
+import { useDispatch, useSelector } from 'react-redux'
+import { RootState } from '../store'
+import { hideSnackbar } from '../features/ui/uiSlice'
 
 interface LayoutProps {
     children: React.ReactNode
 }
 
 const Layout: React.FC<LayoutProps> = ({ children }) => {
+    const dispatch = useDispatch();
+    const snackbar = useSelector((state: RootState) => state.ui.snackbar);
+
     return (
         <>
             <Box sx={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
@@ -19,6 +25,16 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                     </Box>
                 </Box>
             </Box>
+            <Snackbar
+                open={snackbar.open}
+                autoHideDuration={3000}
+                onClose={() => dispatch(hideSnackbar())}
+                anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+            >
+                <Alert severity={snackbar.severity} onClose={() => dispatch(hideSnackbar())}>
+                    {snackbar.message}
+                </Alert>
+            </Snackbar>
         </>
     )
 }

@@ -4,24 +4,32 @@ import {
     Button,
     TextField,
     Typography,
-    Paper,
-    Snackbar,
-    Alert,
     Avatar,
     Badge,
     IconButton,
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
+import CloseIcon from '@mui/icons-material/Close';
 import AddIcon from '@mui/icons-material/Add';
 import { Profile } from '../features/profile/types';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../store';
 import { fetchProfile, saveProfile } from '../features/profile/profileSlice';
 import { countries } from '../constants/countries';
-const ProfileForm: React.FC = () => {
+import { showSnackbar } from '../features/ui/uiSlice';
+import { SnackbarSeverity } from '../features/ui/types';
+
+export type ProfileFormProps = {
+    onClose: () => void;
+};
+const ProfileForm: React.FC<ProfileFormProps> = ({ onClose }) => {
     const dispatch = useDispatch<AppDispatch>();
     const navigate = useNavigate();
     const profile = useSelector((state: RootState) => state.profile)
+    const user = useSelector((state: RootState) => state.auth.user)
+    const [avatarFile, setAvatarFile] = useState<File | null>(null);
+    const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+    const today = new Date().toISOString().split('T')[0];
 
     const [formData, setFormData] = useState<Profile>(profile.data || {
         fullName: '',
@@ -33,12 +41,6 @@ const ProfileForm: React.FC = () => {
         avatarUrl: '',
     });
 
-    const [avatarFile, setAvatarFile] = useState<File | null>(null);
-    const [snackbarOpen, setSnackbarOpen] = useState(false);
-    const [snackbarMessage, setSnackbarMessage] = useState('');
-    const [snackbarSeverity, setSnackbarSeverity] = useState<'success' | 'error' | 'info'>('success');
-    const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
-    const today = new Date().toISOString().split('T')[0];
     useEffect(() => {
         if (avatarFile) {
             const objectUrl = URL.createObjectURL(avatarFile);
@@ -81,9 +83,7 @@ const ProfileForm: React.FC = () => {
 
         const authToken = localStorage.getItem('token');
         if (!authToken) {
-            setSnackbarMessage('You must be logged in to update your profile.');
-            setSnackbarSeverity('error');
-            setSnackbarOpen(true);
+            dispatch(showSnackbar({ message: 'You must be logged in to update your profile.', severity: SnackbarSeverity.ERROR }))
             return;
         }
 
@@ -98,9 +98,7 @@ const ProfileForm: React.FC = () => {
             );
 
             if (!hasChanges) {
-                setSnackbarMessage('No changes to save.');
-                setSnackbarSeverity('info');
-                setSnackbarOpen(true);
+                dispatch(showSnackbar({ message: 'No changes to save.', severity: SnackbarSeverity.INFO }))
                 return;
             }
 
@@ -130,17 +128,11 @@ const ProfileForm: React.FC = () => {
 
 
             await dispatch(saveProfile(formDataToSend))
-
-
-            setSnackbarMessage(profile.data ? 'Profile updated successfully!' : 'Profile created successfully!');
-            setSnackbarSeverity('success');
-            setSnackbarOpen(true);
-            navigate('/dashboard');
+            dispatch(fetchProfile('me'))
+            dispatch(showSnackbar({ message: profile.data ? 'Profile updated successfully!' : 'Profile created successfully!', severity: SnackbarSeverity.SUCCESS }))
+            onClose()
         } catch (error) {
-            console.error(error);
-            setSnackbarMessage(`Something went wrong. ${error}`);
-            setSnackbarSeverity('error');
-            setSnackbarOpen(true);
+            dispatch(showSnackbar({ message: `Something went wrong. ${error}`, severity: SnackbarSeverity.ERROR }))
         }
     };
 
@@ -148,48 +140,19 @@ const ProfileForm: React.FC = () => {
         navigate('/dashboard');
     };
 
-    const handleSnackbarClose = () => {
-        setSnackbarOpen(false);
-    };
 
     return (
-        <Box
-            sx={{
-                width: '100vw',
-                height: '100vh',
-                overflow: 'auto',
-                padding: 2,
-                boxSizing: 'border-box',
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-                flexDirection: 'column',
-                textAlign: 'center',
-                position: 'relative',
-                backgroundImage: 'url(/urbex.jpg)',
-                backgroundSize: 'cover',
-                backgroundPosition: 'center',
-                backgroundRepeat: 'no-repeat',
-            }}
-        >
-            <Paper
-                elevation={3}
-                sx={{
-                    backgroundColor: 'rgba(255, 254, 254, 1)',
-                    padding: '20px',
-                    borderRadius: '8px',
-                    textShadow: '2px 2px 4px rgba(0, 0, 0, 0.4)',
-                    width: '100%',
-                    maxWidth: '400px',
-                }}
-            >
-                <Typography variant="h5" align="center" gutterBottom>
-                    Profile Form
-                </Typography>
+        <>
 
-                <Typography variant="body2" color="textSecondary" align="center" sx={{ mb: 3 }}>
-                    We'd love to get to know you! Please fill out your profile. Nothing is required; all fields are optional and only used to help personalize your experience.
-                </Typography>
+            <Typography variant="h6" gutterBottom sx={{ position: 'absolute', top: '8px', right: '8px' }}>
+                <IconButton
+                    onClick={onClose}
+                >
+                    <CloseIcon />
+                </IconButton>
+            </Typography >
+
+            <Box sx={{ display: 'flex', justifyContent: 'center' }}>
 
                 <Badge
                     overlap="circular"
@@ -214,126 +177,122 @@ const ProfileForm: React.FC = () => {
                         src={avatarUrl || undefined}
                         sx={{ width: 100, height: 100, mx: 'auto', mb: 2 }}
                     />
-                </Badge>
+                </Badge >
+            </Box >
 
 
-                <Box component="form" onSubmit={handleSubmit} noValidate>
-                    <TextField
-                        label="Full Name"
-                        name="fullName"
-                        value={formData.fullName}
-                        onChange={handleInputChange}
-                        fullWidth
-                        margin="normal"
-                        variant="outlined"
-                        slotProps={{ inputLabel: { shrink: Boolean(formData.fullName) } }}
-                    />
+            <Box component="form" onSubmit={handleSubmit} noValidate>
+                <TextField
+                    label="Full Name"
+                    name="fullName"
+                    value={formData.fullName}
+                    onChange={handleInputChange}
+                    fullWidth
+                    margin="normal"
+                    variant="outlined"
+                    slotProps={{ inputLabel: { shrink: Boolean(formData.fullName) } }}
+                />
 
-                    <TextField
-                        select
-                        label="Gender"
-                        name="gender"
-                        value={formData.gender}
-                        onChange={handleInputChange}
-                        fullWidth
-                        margin="normal"
-                        variant="outlined"
-                        slotProps={{ select: { native: true }, inputLabel: { shrink: Boolean(formData.gender) } }}
+                <TextField
+                    select
+                    label="Gender"
+                    name="gender"
+                    value={formData.gender}
+                    onChange={handleInputChange}
+                    fullWidth
+                    margin="normal"
+                    variant="outlined"
+                    slotProps={{ select: { native: true }, inputLabel: { shrink: Boolean(formData.gender) } }}
 
-                    >
-                        <option value="" disabled></option>
-                        <option value="male">Male</option>
-                        <option value="female">Female</option>
-                        <option value="non-binary">Non-binary</option>
-                        <option value="other">Other</option>
-                    </TextField>
+                >
+                    <option value="" disabled></option>
+                    <option value="male">Male</option>
+                    <option value="female">Female</option>
+                    <option value="non-binary">Non-binary</option>
+                    <option value="other">Other</option>
+                </TextField>
 
-                    <TextField
-                        label="Date of Birth"
-                        type="date"
-                        name="birthDate"
-                        value={formData.birthDate}
-                        onChange={handleInputChange}
-                        fullWidth
-                        margin="normal"
-                        variant="outlined"
-                        slotProps={{
-                            inputLabel: { shrink: true },
-                            htmlInput: { max: today }
-                        }}
-                    />
+                <TextField
+                    label="Date of Birth"
+                    type="date"
+                    name="birthDate"
+                    value={formData.birthDate}
+                    onChange={handleInputChange}
+                    fullWidth
+                    margin="normal"
+                    variant="outlined"
+                    slotProps={{
+                        inputLabel: { shrink: true },
+                        htmlInput: { max: today }
+                    }}
+                />
 
-                    <TextField
-                        select
-                        label="Country"
-                        name="country"
-                        value={formData.country}
-                        onChange={handleInputChange}
-                        fullWidth
-                        margin="normal"
-                        variant="outlined"
-                        slotProps={{ select: { native: true }, inputLabel: { shrink: Boolean(formData.gender) } }}
-                    >
-                        <option value="" disabled></option>
-                        {countries.map((country) => (
-                            <option key={country} value={country}>
-                                {country}
-                            </option>
-                        ))}
-                    </TextField>
+                <TextField
+                    select
+                    label="Country"
+                    name="country"
+                    value={formData.country}
+                    onChange={handleInputChange}
+                    fullWidth
+                    margin="normal"
+                    variant="outlined"
+                    slotProps={{ select: { native: true }, inputLabel: { shrink: Boolean(formData.gender) } }}
+                >
+                    <option value="" disabled></option>
+                    {countries.map((country) => (
+                        <option key={country} value={country}>
+                            {country}
+                        </option>
+                    ))}
+                </TextField>
 
-                    <TextField
-                        label="City"
-                        name="city"
-                        value={formData.city}
-                        onChange={handleInputChange}
-                        fullWidth
-                        margin="normal"
-                        variant="outlined"
-                        slotProps={{ inputLabel: { shrink: Boolean(formData.fullName) } }}
-                    />
+                <TextField
+                    label="City"
+                    name="city"
+                    value={formData.city}
+                    onChange={handleInputChange}
+                    fullWidth
+                    margin="normal"
+                    variant="outlined"
+                    slotProps={{ inputLabel: { shrink: Boolean(formData.fullName) } }}
+                />
 
-                    <TextField
-                        label="Biography"
-                        name="biography"
-                        value={formData.biography}
-                        onChange={handleInputChange}
-                        fullWidth
-                        multiline
-                        rows={4}
-                        margin="normal"
-                        variant="outlined"
-                        slotProps={{ inputLabel: { shrink: Boolean(formData.fullName) } }}
-                    />
+                <TextField
+                    label="Biography"
+                    name="biography"
+                    value={formData.biography}
+                    onChange={handleInputChange}
+                    fullWidth
+                    multiline
+                    rows={4}
+                    margin="normal"
+                    variant="outlined"
+                    slotProps={{ inputLabel: { shrink: Boolean(formData.fullName) } }}
+                />
 
-                    <Button
-                        type="submit"
-                        variant="contained"
-                        color="primary"
-                        fullWidth
-                        sx={{ mt: 3, backgroundColor: '#03a9f4' }}
-                    >
-                        Save Profile
-                    </Button>
+                <Button
+                    type="submit"
+                    variant="contained"
+                    color="primary"
+                    fullWidth
+                    sx={{ mt: 3, backgroundColor: '#03a9f4' }}
+                >
+                    Save Profile
+                </Button>
 
-                    <Button
-                        onClick={handleSkip}
-                        variant="contained"
-                        color="primary"
-                        fullWidth
-                        sx={{ mt: 3, backgroundColor: '#757575' }}
-                    >
-                        Maybe later
-                    </Button>
-                </Box>
-            </Paper>
+                {user?.profileIncomplete && <Button
+                    onClick={handleSkip}
+                    variant="contained"
+                    color="primary"
+                    fullWidth
+                    sx={{ mt: 3, backgroundColor: '#757575' }}
+                >
+                    Maybe later
+                </Button>}
+            </Box>
 
-            <Snackbar open={snackbarOpen} autoHideDuration={6000} onClose={handleSnackbarClose}>
-                <Alert onClose={handleSnackbarClose} severity={snackbarSeverity} sx={{ width: '100%' }}>
-                    {snackbarMessage}
-                </Alert>
-            </Snackbar>
-        </Box>
+
+        </>
     );
 };
 

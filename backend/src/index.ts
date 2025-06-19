@@ -10,7 +10,7 @@ const profileRouter = await import('./routes/ProfileRoutes.ts');
 const locationRouter = await import('./routes/LocationRoutes.ts');
 const friendshipRouter = await import('./routes/FriendshipRoutes.ts');
 const notificationRouter = await import('./routes/NotificationRoutes.ts');
-const userRouter = await import('./routes/UserController.ts');
+const userRouter = await import('./routes/UserRoutes.ts');
 const { authenticateJWT } = await import('./middleware/auth.ts');
 
 async function start() {

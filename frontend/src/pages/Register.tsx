@@ -1,10 +1,11 @@
 import React, { useState, FormEvent } from 'react';
-import { Button, TextField, Typography, Box, Snackbar } from '@mui/material';
+import { Button, TextField, Typography, Box } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../store/index.ts';
 import { register } from '../features/auth/authSlice.ts';
 import { Status } from '../store/status.enum.ts';
+import { showSnackbar, SnackbarSeverity } from '../features/ui/uiSlice.ts';
 
 const Register: React.FC = () => {
     const dispatch = useDispatch<AppDispatch>();
@@ -12,8 +13,6 @@ const Register: React.FC = () => {
     const [username, setUsername] = useState<string>('');
     const [email, setEmail] = useState<string>('');
     const [password, setPassword] = useState<string>('');
-    const [openSnackbar, setOpenSnackbar] = useState<boolean>(false);
-    const [snackbarMessage, setSnackbarMessage] = useState<string>('');
 
     const status = useSelector((state: RootState) => state.auth.status)
 
@@ -25,15 +24,13 @@ const Register: React.FC = () => {
 
         try {
             await dispatch(register({ username, email, password })).unwrap();
-            setSnackbarMessage('Registration successful! Redirecting to login...');
-            setOpenSnackbar(true)
-            // navigate to login after 3 s
+            dispatch(showSnackbar({ message: 'Registration successful! Redirecting to login..', severity: SnackbarSeverity.SUCCESS }))
+
             setTimeout(() => {
                 navigate('/login');
             }, 3000)
         } catch (error) {
-            setSnackbarMessage(error);
-            setOpenSnackbar(true)
+            dispatch(showSnackbar({ message: `Something went wrong ${error}`, severity: SnackbarSeverity.ERROR }))
         }
 
     };
@@ -112,13 +109,6 @@ const Register: React.FC = () => {
                     Already have an account? Login
                 </Button>
             </Box>
-
-            <Snackbar
-                open={openSnackbar}
-                autoHideDuration={5000}
-                onClose={() => setOpenSnackbar(false)}
-                message={snackbarMessage}
-            />
         </Box>
     );
 };
